@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BMA EMS Decision Support Tool v6</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'Inter', 'sans-serif'],
+                        mono: ['Courier New', 'monospace']
+                    },
+                    colors: {
+                        bma: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            dark: '#0A5C36'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .bma-gradient {
+            background: linear-gradient(135deg, #0A5C36 0%, #115e3b 100%);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col antialiased bg-slate-50">
+
+    <!-- TOP HEADER (MOBILE OPTIMIZED) -->
+    <header class="bma-gradient text-white shadow-md flex-shrink-0 sticky top-0 z-50">
+        <div class="px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-1 rounded-full shadow-inner flex-shrink-0">
+                    <svg class="w-9 h-9 text-bma-dark" viewBox="0 0 100 100" fill="currentColor">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="4"/>
+                        <path d="M50 15 L53 30 L68 30 L56 40 L60 55 L50 45 L40 55 L44 40 L32 30 L47 30 Z" />
+                        <text x="50" y="75" font-family="Sarabun" font-weight="bold" font-size="10" text-anchor="middle" fill="currentColor">กทม.</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tight leading-tight">แนวทางประสานส่งผู้ป่วยฉุกเฉิน</h1>
+                    <p class="text-[10px] text-emerald-100 font-medium">ฉบับที่ 6 ปรับปรุงใหม่ • 1 มิถุนายน 2569</p>
+                </div>
+            </div>
+            <button onclick="goToHome()" class="bg-emerald-800/60 hover:bg-emerald-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border border-emerald-600/30">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                หน้าแรก
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-20">
+
+        <!-- STEP 1: HOME LANDING - TRIAGE WIZARD SELECTION -->
+        <div id="view-home" class="space-y-4">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-bma-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    เริ่มกระบวนการตัดสินใจหน้างาน (Triage Guide)
+                </h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    ระบบจะนำทางและแนะนำคำสั่งอำนวยการประสานส่ง (Directing Protocol) ที่ถูกต้องตามกฎหมายและระเบียบ กพฉ.กทม. ล่าสุด กรุณาเลือกสภาพผู้ป่วยที่เผชิญอยู่ ณ ขณะนี้:
+                </p>
+            </div>
+
+            <!-- TRIAGE BIG TOUCH BUTTONS -->
+            <div class="grid grid-cols-1 gap-3">
+                
+                <!-- RED TRIAGE BUTTON -->
+                <button onclick="selectTriage('red')" class="w-full text-left bg-white border border-rose-200 hover:border-rose-400 p-4 rounded-xl shadow-sm flex items-start gap-3 transition-all active:scale-[0.99]">
+                    <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-600 mt-0.5 flex items-center justify-center text-white text-[10px] font-bold">🔴</span>
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-rose-900">ผู้ป่วยสีแดง (วิกฤตฉุกเฉิน)</h3>
+                        <p class="text-xs text-rose-700 leading-normal">
+                            ผู้ป่วยวิกฤตที่มีความเสี่ยงต่อการเสียชีวิต เกณฑ์ ESI 1 หรือ ESI 2 หรือมีอาการวิกฤตฉุกเฉินตามโปรโตคอล
+                        </p>
+                    </div>
+                </button>
+
+                <!-- YELLOW TRIAGE BUTTON -->
+                <button onclick="selectTriage('yellow')" class="w-full text-left bg-white border border-amber-200 hover:border-amber-400 p-4 rounded-xl shadow-sm flex items-start gap-3 transition-all active:scale-[0.99]">
+                    <span class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500 mt-0.5 flex items-center justify-center text-white text-[10px] font-bold">🟡</span>
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-amber-900">ผู้ป่วยสีเหลือง (เร่งด่วน)</h3>
+                        <p class="text-xs text-amber-700 leading-normal">
+                            ผู้ป่วยเร่งด่วน เกณฑ์ ESI 3 (ผู้ป่วยมีสัญญาณชีพคงที่ แต่มีภาวะเสี่ยงหรือเจ็บปวดรุนแรง)
+                        </p>
+                    </div>
+                </button>
+
+                <!-- GREEN TRIAGE BUTTON -->
+                <button onclick="selectTriage('green')" class="w-full text-left bg-white border border-emerald-200 hover:border-emerald-400 p-4 rounded-xl shadow-sm flex items-start gap-3 transition-all active:scale-[0.99]">
+                    <span class="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-600 mt-0.5 flex items-center justify-center text-white text-[10px] font-bold">🟢</span>
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-emerald-900">ผู้ป่วยสีเขียว (ไม่ฉุกเฉิน)</h3>
+                        <p class="text-xs text-emerald-700 leading-normal">
+                            ผู้ป่วยทั่วไป เกณฑ์ CBD เขียว หรือ ESI 4 หรือ ESI 5
+                        </p>
+                    </div>
+                </button>
+
+                <!-- OTHER PROTOCOLS DIVIDER -->
+                <div class="py-2">
+                    <div class="relative flex py-1 items-center">
+                        <div class="flex-grow border-t border-slate-300"></div>
+                        <span class="flex-shrink-0 mx-4 text-xs font-bold text-slate-500 uppercase tracking-wider">กลุ่มโรคและเงื่อนไขเฉพาะ</span>
+                        <div class="flex-grow border-t border-slate-300"></div>
+                    </div>
+                </div>
+
+                <!-- SPECIAL FAST TRACK BUTTONS (2-COL ON TABLET / 1-COL MOBILE) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    
+                    <button onclick="selectTriage('stroke')" class="text-left bg-white border border-slate-200 hover:border-blue-400 p-3.5 rounded-xl shadow-sm flex items-center gap-3 transition-all">
+                        <span class="text-xl">🧠</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Stroke Fast Track</h4>
+                            <p class="text-[11px] text-slate-500 leading-tight">โปรโตคอลหลอดเลือดสมองวิกฤต</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectTriage('stemi')" class="text-left bg-white border border-slate-200 hover:border-rose-400 p-3.5 rounded-xl shadow-sm flex items-center gap-3 transition-all">
+                        <span class="text-xl">❤️</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">STEMI Fast Track</h4>
+                            <p class="text-[11px] text-slate-500 leading-tight">โปรโตคอลกล้ามเนื้อหัวใจขาดเลือดเฉียบพลัน</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectTriage('trauma')" class="text-left bg-white border border-slate-200 hover:border-indigo-400 p-3.5 rounded-xl shadow-sm flex items-center gap-3 transition-all">
+                        <span class="text-xl">🩹</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Trauma Fast Track</h4>
+                            <p class="text-[11px] text-slate-500 leading-tight">Head Injury / อวัยวะขาด / แผลไหม้</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectTriage('maternal')" class="text-left bg-white border border-slate-200 hover:border-pink-400 p-3.5 rounded-xl shadow-sm flex items-center gap-3 transition-all">
+                        <span class="text-xl">🤰</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">มารดาและทารกแรกคลอด</h4>
+                            <p class="text-[11px] text-slate-500 leading-tight">เกณฑ์ In Labor และคลอดฉุกเฉิน (BBA)</p>
+                        </div>
+                    </button>
+
+                    <button onclick="selectTriage('dnr')" class="text-left bg-white border border-slate-200 hover:border-slate-400 p-3.5 rounded-xl shadow-sm flex items-center gap-3 transition-all sm:col-span-2">
+                        <span class="text-xl">🎗️</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">DNR / Palliative Care</h4>
+                            <p class="text-[11px] text-slate-500 leading-tight">การนำส่งกรณีเซ็นงดกู้ชีพ และผู้ป่วยประคับประคอง</p>
+                        </div>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- SEARCH HUB QUICK BUTTON -->
+            <div class="bg-slate-200/60 p-4 rounded-xl border border-slate-300 flex items-center justify-between">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800">ต้องการดูระเบียบคู่มือตัวเต็ม?</h4>
+                    <p class="text-[11px] text-slate-600">เปิดเอกสารคู่มือแยกตามพาร์ทและค้นหาคำสำคัญ</p>
+                </div>
+                <button onclick="switchTab('tab-hub')" class="bg-bma-dark hover:bg-bma-800 text-white text-xs font-bold py-2 px-3.5 rounded-lg shadow">
+                    เปิดเอกสารคู่มือ
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 2: ACTIVE WIZARD GUIDE -->
+        <div id="view-wizard" class="space-y-4 hidden">
+            
+            <!-- Breadcrumbs / Back button -->
+            <div class="flex items-center justify-between">
+                <button onclick="goToHome()" class="text-slate-600 hover:text-slate-900 text-xs font-bold flex items-center gap-1.5 py-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    กลับไปหน้าแรก
+                </button>
+                <span id="wizard-badge" class="px-2.5 py-1 rounded-full text-xs font-bold text-white uppercase">
+                    TRIAGE STATUS
+                </span>
+            </div>
+
+            <!-- DYNAMIC QUESTION CARD -->
+            <div id="wizard-question-card" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-4">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- DYNAMIC RESULT GUIDE CARD -->
+            <div id="wizard-result-card" class="hidden space-y-4">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+        </div>
+
+        <!-- STEP 3: FULL REFERENCE MANUALS HUB -->
+        <div id="view-hub" class="space-y-4 hidden">
+            <!-- Search bar -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                <label class="block text-xs font-bold text-slate-600">ค้นหาด่วนภายในคู่มือ (Search Manual)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </span>
+                    <input id="search-input" type="text" placeholder="พิมพ์คำค้นหา (เช่น DNR, CT, UCEP)..." class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-bma-600 focus:outline-none" oninput="searchProtocols()">
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex overflow-x-auto gap-1 pb-1 scrollbar-none">
+                <button onclick="switchManualTab('tab-triage')" id="btn-tab-triage" class="manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-bma-dark text-white">
+                    🔴 สีแดงวิกฤต
+                </button>
+                <button onclick="switchManualTab('tab-yellow-green')" id="btn-tab-yellow-green" class="manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-600 border border-slate-200">
+                    🟡 สีเหลือง/เขียว
+                </button>
+                <button onclick="switchManualTab('tab-fasttrack')" id="btn-tab-fasttrack" class="manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-600 border border-slate-200">
+                    ⚡ Fast Tracks
+                </button>
+                <button onclick="switchManualTab('tab-maternal-dnr')" id="btn-tab-maternal-dnr" class="manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-600 border border-slate-200">
+                    🤰 แม่และเด็ก/DNR
+                </button>
+                <button onclick="switchManualTab('tab-admin')" id="btn-tab-admin" class="manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-600 border border-slate-200">
+                    📋 กฎทั่วไป/อำนาจ
+                </button>
+            </div>
+
+            <!-- MANUAL CONTENTS -->
+            <div class="space-y-4" id="manual-contents-container">
+
+                <!-- TAB 1: RED -->
+                <div id="man-triage" class="manual-tab-content space-y-4">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-600"></span>
+                            <h3 class="text-base font-bold text-rose-900">3.1 แนวทางการประสานส่งผู้ป่วยสีแดง (วิกฤต)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+                            <div class="bg-rose-50 border border-rose-100 rounded-lg p-3 space-y-1">
+                                <p class="font-bold text-rose-950">1. การส่งตัวไปยัง รพ. ใกล้ที่สุด:</p>
+                                <p class="text-xs text-rose-900">
+                                    ประสานโรงพยาบาลที่ใกล้ที่สุด (รัฐบาลหรือโรงพยาบาลเอกชนกรณีเข้าเกณฑ์สิทธิ์ UCEP) โดย <span class="font-bold underline">ไม่อิงพื้นที่โซน</span>
+                                </p>
+                            </div>
+                            
+                            <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 space-y-1">
+                                <p class="font-bold text-indigo-950">2. เกณฑ์อนุโลมระยะทาง 5 กิโลเมตร:</p>
+                                <p class="text-xs text-indigo-900 leading-normal">
+                                    หากผู้ปฏิบัติงานหน้างานหรือศูนย์สั่งการทราบสิทธิ์รักษาพยาบาลหลัก หรือทราบประวัติการรักษาเดิมของผู้ป่วย และระยะทางห่างจากโรงพยาบาลใกล้เคียงที่สุด ต่างจากโรงพยาบาลตามสิทธิ์หรือประวัติเดิม <span class="font-bold text-indigo-700">ไม่เกิน 5 กิโลเมตรโดยประมาณ</span> และทีมกู้ชีพประเมินแล้วว่าสามารถนำส่งได้อย่างปลอดภัย <b>ให้พิจารณาส่งไปยังโรงพยาบาลตามสิทธิ์การรักษาเป็นลำดับแรก</b> ตามด้วยโรงพยาบาลประวัติรักษาเดิม
+                                </p>
+                                <p class="text-xs text-rose-700 font-bold">
+                                    *ยกเว้น: กรณีผู้ป่วยหัวใจหยุดเต้น (Cardiac Arrest) หรือกรณีที่แพทย์อำนวยการประเมินว่ามีอันตรายสาหัสยิ่งยวด ให้นำส่ง รพ. ใกล้เคียงที่สุดทันทีโดยไม่มีการอนุโลม
+                                </p>
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-900">3. กฎกรอบเวลาเร่งนำส่ง (กฎ 5 นาที):</p>
+                                <p class="text-xs text-slate-600 pl-2">
+                                    หากผ่านการประสานงานโรงพยาบาลผ่านศูนย์นำส่งและใช้เวลารอการตอบรับนานเกินกว่า 5 นาทีขึ้นไป ให้รถพยาบาลเคลื่อนตัวออกเดินทางไปยังโรงพยาบาลเป้าหมายที่ใกล้ที่สุดทันทีโดยไม่ต้องจอดคอย ระหว่างนั้นให้ดำเนินการประสานงานต่อไปในทางลับ
+                                </p>
+                            </div>
+
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-1.5">
+                                <p class="font-bold text-amber-950">⚠️ โปรโตคอล "ยืนยันนำส่ง" และกระจายเคส (สีแดง):</p>
+                                <ul class="list-disc pl-4 text-xs text-amber-900 space-y-1">
+                                    <li><b>หากประสานงานแล้วไม่มี รพ. ใดตอบรับเคส:</b> ให้สั่ง <b>"ยืนยันนำส่ง"</b> ไปยังโรงพยาบาลใกล้ที่สุด (หรือโรงพยาบาลตามสิทธิ์/ประวัติเดิมในรัศมีอนุโลม 5 กม. หากประเมินว่าปลอดภัย)</li>
+                                    <li><b>กฎกระจายเคส 30 นาที:</b> หากโรงพยาบาลปลายทางแห่งใดเพิ่งรับผู้ป่วยสีแดงสำเร็จ (ยึดตามเวลาถึงโรงพยาบาล) ให้เว้นระยะการประสานนำส่งผู้ป่วยสีแดงเคสถัดไปเป็นเวลา 30 นาที เพื่อลดภาระงานของแผนกฉุกเฉิน ยกเว้นพ้นขีดจำกัดวิกฤต โดยให้ประสานส่งไปยังโรงพยาบาลรัฐบาลที่ใกล้รองลงมาตามลำดับที่ 2 และ 3 แทน</li>
+                                    <li><b>ผู้ป่วยต่างชาติ / ต่างด้าว / ไร้เอกสารสิทธิ์:</b> ปฏิบัติการประสานส่งเสมือนคนไทย หากผู้ป่วยหรือญาติไม่ประสงค์ประสงค์ส่งต่อเอกชน หรือเอกชนไม่รับสิทธิ์ UCEP ให้ส่งโรงพยาบาลรัฐทดแทน (เว้นแต่หัวใจหยุดเต้น ให้ยืนยันนำส่งใกล้ที่สุดทันที)</li>
+                                    <li><b>กรณี รพ. เอกชนปฏิเสธ:</b> หากเอกชนไม่ยินยอมให้เข้าประตูนำส่ง ให้รถนำส่งผู้ป่วยไป รพ. รัฐที่ใกล้เคียงที่สุดทดแทน (ยกเว้นหัวใจหยุดเต้นให้ยืนยันดันเข้าใกล้สุด) จากนั้นศูนย์เอราวัณจะรวบรวมรายงานส่ง สพฉ. เพื่อประกอบคดีตาม พ.ร.บ. การแพทย์ฉุกเฉิน พ.ศ. 2551</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2">
+                            <h3 class="text-base font-bold text-rose-900">3.2 ผู้ป่วยสีแดงที่ได้รับการกู้ชีพพ้นภาวะวิกฤตแล้ว</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-800">เงื่อนไขการคัดแยกและการนำส่ง:</p>
+                            <ul class="list-disc pl-4 text-xs space-y-1">
+                                <li>ให้ประสานส่งโรงพยาบาลที่ใกล้ที่สุด (รัฐ/เอกชน) โดยอิงกฎระยะต่างอนุโลมสิทธิ์ไม่เกิน 5 กิโลเมตร เช่นกัน</li>
+                                <li>หากโรงพยาบาลปลายทางใกล้สุดทำการตรวจเช็กพบผู้ป่วยมีสัญญาณชีพสเถียรและสามารถส่งต่อไปยัง รพ. ตามสิทธิ์หลักได้อย่างปลอดภัย ให้ทำการบันทึกลงในเอกสาร <span class="bg-emerald-100 text-emerald-800 font-bold px-1 rounded">ใบเขียว</span> และให้นำส่งคนไข้ไปยังโรงพยาบาลต้นสิทธิ์รักษาหลัก</li>
+                                <li><b>กรณีโรงพยาบาลปลายทางใกล้ที่สุดปฏิเสธรับเคส:</b>
+                                    <ul class="list-decimal pl-4 mt-1 space-y-1 font-semibold text-slate-800">
+                                        <li><u>ชุดระดับเฉพาะทาง (มีแพทย์ EP ประจำทีม)</u>: แพทย์อำนวยการประสานงานพิจารณาส่งต่อในฐานะผู้ป่วยสีเหลือง</li>
+                                        <li><u>ชุดระดับสูง (ALS)</u>: ให้ประสานส่งเสมือนสีเหลือง โดยกำหนดให้ระยะทางขนส่ง <span class="text-rose-700 underline">ต้องไม่เกินประมาณ 20 กิโลเมตร</span> เนื่องจากยังถือว่าผู้ป่วยมีความเสี่ยงวิกฤตซ้ำซ้อน (ยกเว้นเคส Hypoglycemia ที่พ้นขีดจำกัดภาวะน้ำตาลต่ำแล้วและไม่มีข้อกังวลอื่น)</li>
+                                    </ul>
+                                </li>
+                                <li><b>เกณฑ์ประเมินหากไม่มี รพ. รับเคส:</b> การสั่งยืนยันนำส่งให้ประเมินจากหลักสากล Airway, Breathing, Circulation, Vital Signs <span class="text-rose-700 font-bold">(ห้ามนำระดับความรู้สึกตัว หรือระดับ GCS มาเปรียบเทียบหรือเป็นตัวตัดสิทธิ์นำส่ง เช่น ซึมอย่างเดียวแต่ Vital Signs คงที่ ปลอดภัยแล้ว สามารถส่งไปตามสิทธิ์ได้)</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: YELLOW & GREEN -->
+                <div id="man-yellow-green" class="manual-tab-content space-y-4 hidden">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <h3 class="text-base font-bold text-amber-900">4.1 ผู้ป่วยสีเหลือง (กรณีมีสิทธิ์การรักษาใน กทม.)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-900">1. ลำดับการประสานงานส่งต่อ รพ. ตามสิทธิ์:</p>
+                            <p class="text-xs text-slate-600 pl-2">
+                                ดำเนินการประสานส่งไปยังโรงพยาบาลตามสิทธิ์การรักษาพยาบาลหลักของผู้ป่วย โดยต้องอยู่ภายในระยะเดินทาง <span class="font-bold text-indigo-700">ไม่เกินประมาณ 40 กิโลเมตร</span> โดยประมาณ
+                            </p>
+                            <p class="font-bold text-slate-900">2. กรณี รพ. ตามสิทธิ์ปฏิเสธ หรือระยะเดินทางเกิน 40 กิโลเมตร:</p>
+                            <p class="text-xs text-slate-600 pl-2">
+                                ให้ทำการประสานส่งไปยังโรงพยาบาลเป้าหมายที่มีประวัติรับการรักษาโรคประจำตัวเดิมของผู้ป่วยเป็นประจำ (ซึ่งเข้ารับการตรวจรักษาอย่างต่อเนื่องภายในระยะเวลา 1 ปีที่ผ่านมา) ภายในระยะทางเดินทางไม่เกินประมาณ 40 กิโลเมตรเช่นเดียวกัน
+                            </p>
+                            <div class="bg-amber-50 border border-amber-200 rounded p-2.5 text-xs text-amber-950 font-semibold">
+                                📌 หากไม่มี รพ. ตอบรับเคส: แพทย์อำนวยการประสานงานจะประเมินประกอบโรคประจำตัวร่วมด้วยเพื่อทำคำสั่ง <b>"ยืนยันนำส่ง"</b> (เช่น มีมะเร็งรักษาร่วมกับการเจ็บป่วยฉุกเฉินปัจจุบัน ให้ส่งไปยังโรงพยาบาลประวัติรักษาโรคมะเร็งเดิม)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2">
+                            <h3 class="text-base font-bold text-amber-900">4.2 ผู้ป่วยสีเหลือง (กรณีสิทธิ์ว่าง / ข้าราชการ / สิทธิ์ต่างจังหวัด)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">ให้ประสานนำส่งตามลำดับบันได 4 ขั้น ดังนี้:</p>
+                            <div class="space-y-2">
+                                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-xs">
+                                    <span class="font-bold text-bma-700">ขั้นที่ 1:</span> <b>โรงพยาบาลที่มีประวัติรักษาโรคประจำตัวเดิม</b> (รักษาต่อเนื่องใน 1 ปีที่ผ่านมา <span class="text-rose-600">ไม่รวมโรคทั่วไป เช่น ไอ เจ็บคอ ตรวจตา</span>) ในรัศมี 40 กิโลเมตร
+                                </div>
+                                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-xs">
+                                    <span class="font-bold text-bma-700">ขั้นที่ 2:</span> <b>โรงพยาบาลที่ใกล้เคียงจุดเกิดเหตุที่สุด</b> ภายในระยะทางประมาณ 40 กิโลเมตร
+                                </div>
+                                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-xs">
+                                    <span class="font-bold text-bma-700">ขั้นที่ 3:</span> <b>โรงพยาบาลแม่ข่ายรายโซน (รพ. แม่โซน)</b>
+                                </div>
+                                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-xs">
+                                    <span class="font-bold text-bma-700">ขั้นที่ 4:</span> <b>โรงพยาบาลสังกัดสำนักการแพทย์</b> ประจำพื้นที่โซนฉุกเฉินนั้นๆ (ถ้ามี)
+                                </div>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-200 p-2.5 rounded text-xs text-rose-950 font-bold">
+                                🛑 หากประสานทั้ง 4 ขั้นแล้วไม่มีโรงพยาบาลใดตอบรับเคสสิทธิ์ว่าง/ข้าราชการ/สิทธิ์ต่างจังหวัด: ให้สั่ง "ยืนยันนำส่ง" รพ. ประวัติเดิม หากไม่มีประวัติรักษาเดิม ให้ "ยืนยันนำส่ง" ไปยังโรงพยาบาลรัฐบาลที่ใกล้ที่สุด (ไม่อิงพื้นที่โซน)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                            <h3 class="text-base font-bold text-emerald-900">4.3 แนวทางผู้ป่วยสีเขียว (ไม่ฉุกเฉิน)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <ul class="list-disc pl-4 text-xs space-y-1">
+                                <li>ให้ดำเนินการประสานส่งเรื่องผ่าน <b>UMSC (หน่วยแพทย์เครือข่ายส่วนกลาง)</b> เป็นหลัก</li>
+                                <li>หากมีความจำเป็นเหมาะสมประการสำคัญ สามารถประสานใช้รถปฏิบัติการระดับพื้นฐาน (BLS) เพื่อช่วยนำส่งแผนกผู้ป่วยนอก (OPD) ของโรงพยาบาลตามสิทธิ์เป้าหมายตามเวลาทำการ</li>
+                                <li><b>กรณีทีม ALS ตรวจคัดแยกผู้ป่วยหน้างานแล้วพบเป็นเคสสีเขียว:</b> ให้ดำเนินการนำส่งโรงพยาบาลตามสิทธิ์หลัก หรือนำส่งตามเจตจำนงและความประสงค์ของผู้ป่วยตามความเหมาะสม</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: FAST TRACKS -->
+                <div id="man-fasttrack" class="manual-tab-content space-y-4 hidden">
+                    <!-- Stroke Fast Track -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                            <h3 class="text-base font-bold text-blue-900">🧠 5.1 Stroke Fast Track Protocol</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <ul class="list-disc pl-4 text-xs space-y-1.5">
+                                <li><b>ระยะเกิดอาการ Onset &lt; 4.5 ชั่วโมง:</b> ประสานนำส่งโรงพยาบาลที่มีขีดความสามารถเฉพาะทางรักษาและให้ยาละลายลิ่มเลือด <span class="font-bold text-blue-700">rTPA / FTPA</span> โดยประเมินการจราจรและความรวดเร็วในการรับยาเป็นหลักสำคัญ</li>
+                                <li><b>นิยาม Onset:</b> ยึดตามเวลาที่เกิดอาการจริง หากไม่แน่ชัด ให้ยึดช่วงเวลาสุดท้ายที่เห็นผู้ป่วยปกติทดแทน (<span class="font-bold text-blue-800">Last seen normal</span>)</li>
+                                <li><b>สงสัย Large Vessel Occlusion (LVO) หลอดเลือดใหญ่อุดตัน:</b> ประสานส่ง รพ. ทั่วไปรับการวินิจฉัย CT Brain ก่อน จากนั้นโรงพยาบาลจะส่งต่อส่งทำ Thrombectomy ภายหลัง</li>
+                                <li><b>กรณีอาการแสดงผู้ป่วยไม่ชัดเจน:</b> แพทย์อำนวยการสามารถสั่งให้นำส่งโรงพยาบาลที่มีเพียงขีดความสามารถการทำ CT Brain ก่อนได้</li>
+                                <li>ในบางพื้นที่โซนฉุกเฉินเฉพาะ ให้ประสานนำส่งร่วมกับระบบ <b>Mobile Stroke Unit (MSU)</b> (เช่น รพ. ศิริราช, รพ. นพรัตนราชธานี)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- STEMI Fast Track -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-600"></span>
+                            <h3 class="text-base font-bold text-rose-900">❤️ 5.2 STEMI Fast Track Protocol</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <ul class="list-disc pl-4 text-xs space-y-1.5">
+                                <li><b>การส่งต่อ รพ.:</b> ปฏิบัติการกู้ชีพและประสานนำส่งในรูปแบบเดียวกับผู้ป่วยสีแดง แต่ต้องระบุปลายทางเป็น <b>โรงพยาบาลที่มีห้องทำหัตถการขยายหลอดเลือด (รพ. สวนหัวใจได้ตลอด 24 ชั่วโมง)</b> เท่านั้น</li>
+                                <li><b>การส่งต่อข้อมูลคลื่นหัวใจ:</b> หากทีมกู้ชีพทำ EKG 12 Lead สำเร็จ ให้ถ่ายรูปความชัดเจนสูงส่งไลน์ศูนย์สั่งการเอราวัณ ID Line: <span class="font-bold font-mono text-rose-700">1646erawan</span> ทันที เพื่อให้ส่วนกลางช่วยประสานระบบเปิดห้องสวนหัวใจ</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Trauma Fast Track -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
+                            <h3 class="text-base font-bold text-indigo-900">🩹 5.3 Trauma Fast Track Protocol (บาดเจ็บรุนแรง)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-800">5.3.1 Head Injury (บาดเจ็บที่ศีรษะ):</p>
+                                <p class="text-xs text-slate-500">หาก Vital Signs ไม่คงที่ หรือมีบาดเจ็บส่วนอื่นสาหัสวิกฤต ให้ประสานส่งแบบ <span class="font-bold text-rose-700">ผู้ป่วยสีแดง</span></p>
+                                <ul class="list-disc pl-4 text-xs space-y-1">
+                                    <li><b>GCS 13 - 15</b>: ประสานส่งตัวเสมือน <span class="text-amber-700 font-bold">ผู้ป่วยสีเหลือง</span></li>
+                                    <li><b>GCS 9 - 12</b>: ประสานนำส่งโรงพยาบาลใกล้เคียงที่ขีดความสามารถทำ <b>CT Brain</b></li>
+                                    <li><b>GCS 3 - 8 (วิกฤตหมดสติ)</b>: <span class="text-rose-700 font-bold">ต้องประคองจัดตั้งทางเดินหายใจ (Airway First) ให้เรียบร้อยปลอดภัยเป็นอันดับแรก</span> โดยใช้ OPA / Head-tilt, Chin-lift / Jaw thrust หรือ ETT บนรถกู้ชีพ หรือแวะใส่ ETT ณ ER โรงพยาบาลใกล้เคียงที่สุดก่อนนำส่งต่อ</li>
+                                </ul>
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-800">5.3.2 Amputation / Near amputation (ขาด/ใกล้ขาด):</p>
+                                <p class="text-xs text-indigo-700 font-bold">*บังคับกรณีที่อวัยวะขาดตั้งแต่ระดับเหนือข้อเท้า หรือเหนือข้อมือขึ้นไป (Proximal)</p>
+                                <ul class="list-disc pl-4 text-xs space-y-0.5">
+                                    <li>หาก Vital Signs Unstable หรือมี associated injury รุนแรง ให้ประสานแบบ <b>ผู้ป่วยสีแดง</b></li>
+                                    <li>หาก Vital Signs Stable และไม่มีบาดเจ็บร่วมส่วนอื่นสาหัส ให้ประสานส่ง <b>โรงพยาบาลที่มีศัลยแพทย์หลอดเลือด (Vascular Surgeon)</b></li>
+                                </ul>
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-800">5.3.3 Severe Burn (แผลไหม้รุนแรง):</p>
+                                <ul class="list-disc pl-4 text-xs space-y-0.5">
+                                    <li>หาก Vital Signs Unstable หรือทางเดินหายใจโดนทำลาย ให้ประสานแบบ <b>ผู้ป่วยสีแดง</b></li>
+                                    <li>หาก Vital Signs Stable ให้ดำเนินการประสานส่งไปยัง <b>โรงพยาบาลที่มีหออภิบาลแผลไหม้เฉพาะทาง (Burn Unit)</b></li>
+                                    <li>หากไม่มี รพ. ตอบรับเคส: แพทย์สั่งยืนยันนำส่งไปยังโรงพยาบาลรัฐบาลที่ใกล้ที่สุดที่มี <b>แพทย์ศัลยกรรมทั่วไป (General Surgeon)</b></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: MATERNAL & DNR -->
+                <div id="man-maternal-dnr" class="manual-tab-content space-y-4 hidden">
+                    <!-- Maternal & Child -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-pink-500"></span>
+                            <h3 class="text-base font-bold text-pink-900">🤰 6. มารดาและทารกแรกคลอด (In Labor / BBA)</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+                            <div class="bg-pink-50 p-2.5 rounded border border-pink-100 text-xs">
+                                📌 <b>เกณฑ์ระยะทางนำส่งแม่และเด็ก:</b> เคสสีแดงวิกฤตระยะเดินทางสูงสุดต้องไม่เกินประมาณ <b>20 กิโลเมตร</b> และหากประเมินเป็นสีเหลืองระยะเดินทางสูงสุดต้องไม่เกินประมาณ <b>40 กิโลเมตร</b> โดยประมาณ
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-900">6.1 ทารกคลอดเรียบร้อยแล้วนอกสถานพยาบาล (BBA):</p>
+                                <ol class="list-decimal pl-4 text-xs space-y-1">
+                                    <li><b>รพ. ปลายทางที่มี NICU (หออภิบาลวิกฤตเด็กแรกเกิด):</b> ส่งไปหากพบเกณฑ์ข้อใดข้อหนึ่ง
+                                        <ul class="list-disc pl-4 font-semibold text-rose-700">
+                                            <li>ทารกต้องการการช่วยหายใจแบบ PPV, CPAP หรือใส่ท่อช่วยหายใจ (ETT)</li>
+                                            <li>แพทย์อำนวยการประเมินว่าทารกเสี่ยงวิกฤตต้องการ Intensive monitoring</li>
+                                            <li>คลอดก่อนกำหนด GA &le; 32 สัปดาห์ หรือน้ำหนักแรกคลอด &le; 1,500 กรัม</li>
+                                        </ul>
+                                    </li>
+                                    <li><b>รพ. ปลายทางที่มี Sick Newborn (ห้องทารกป่วย):</b> หากทารกมีภาวะผิดปกติภายนอกแต่ไม่เข้าเกณฑ์ NICU (เช่น Apgar &le; 8, hypoglycemia &le; 50 mg/dl, ปัญหาการหายใจ/อัตราเต้นหัวใจ) ร่วมกับ GA &gt; 32 สัปดาห์ และน้ำหนักแรกคลอด &gt; 1,500 กรัม</li>
+                                    <li><b>รพ. ปลายทางที่มีกุมารแพทย์ทั่วไป:</b> หากไม่มีข้อบ่งชี้หรือความเสี่ยงผิดปกติข้างต้นเลย</li>
+                                </ol>
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="font-bold text-slate-900">6.2 ทารกยังอยู่ในครรภ์มารดา (In Labor):</p>
+                                <ol class="list-decimal pl-4 text-xs space-y-1">
+                                    <li>ประสานส่งต่อไปยังโรงพยาบาลที่มารดาฝากครรภ์เป็นอันดับแรก หรือโรงพยาบาลตามสิทธิ์หลัก</li>
+                                    <li>กรณีโรงพยาบาลดังกล่าวปฏิเสธ ให้คัดกรองขีดความสามารถการดูแลสำรองเทียบเกณฑ์อายุครรภ์ทารก (GA) และน้ำหนักตัวเสมือนข้อ 6.1 (เกณฑ์ NICU vs Sick Newborn vs กุมารแพทย์ทั่วไป)</li>
+                                </ol>
+                            </div>
+                            <div class="bg-amber-50 p-2.5 rounded border border-amber-200 text-xs text-amber-950 font-bold">
+                                ⚠️ ในกรณีไม่ทราบอายุครรภ์ ให้ทีมหน้างานประมาณการจากการซักถามประวัติและตรวจร่างกาย / หากไม่มี รพ. ตอบรับเคส แพทย์สั่งยืนยันนำส่งไปยังโรงพยาบาลรัฐบาลใกล้ที่สุดที่มีกุมารแพทย์ทั่วไป
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DNR -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-slate-800"></span>
+                            <h3 class="text-base font-bold text-slate-950">🎗️ 7. ผู้ป่วยสีแดงประสงค์ DNR / Palliative Care</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+                            <div class="bg-amber-50 p-2.5 rounded border border-amber-100 text-xs space-y-0.5">
+                                <p class="font-bold text-amber-900">7.1 มีประวัติเซ็น DNR เดิม / มี Wrist Band Palliative:</p>
+                                <p class="text-slate-700 leading-normal">
+                                    ไม่ต้องขอตรวจสอบใบเอกสารตัวจริง ญาติมีสิทธิ์แจ้งประวัติเดิมหรือแสดงสถานะสายรัดข้อมือสีสัญญะ <span class="font-bold text-amber-800">→ ให้ศูนย์สั่งการประสานส่งเช่นเดียวกับผู้ป่วยสีเหลือง</span> เพื่อหลีกเลี่ยงการกู้ชีพทรมานที่ไม่พึงประสงค์
+                                </p>
+                            </div>
+
+                            <div class="bg-rose-50 p-2.5 rounded border border-rose-100 text-xs space-y-1">
+                                <p class="font-bold text-rose-900">7.2 ผู้ป่วยประสงค์แสดงเจตนา DNR ใหม่บนรถพยาบาลครั้งแรก:</p>
+                                <ul class="list-disc pl-4 text-rose-950 space-y-1 leading-normal">
+                                    <li><b>ทีมระดับ ALS / BLS:</b> ถือว่าสถานะ DNR ยังไม่สมบูรณ์ถูกต้องตามข้อกฎหมาย <span class="font-bold text-rose-700">ต้องดำเนินการประสานส่งเช่นเดียวกับผู้ป่วยสีแดงปกติ</span> (คำแนะนำ: ควรเลี่ยง รพ. เอกชนเพื่อเลี่ยงข้อพิพาทสิทธิ์ UCEP) เมื่อนำส่งถึงห้องฉุกเฉิน แพทย์เวรจะเป็นผู้ประเมินพูดคุยและดูแลให้เซ็นอย่างเป็นทางการจึงจะสมบูรณ์</li>
+                                    <li><b>ทีมเฉพาะทางที่มีแพทย์ EP ร่วมทีมด้วย:</b> หากให้ญาติผู้ป่วยลงนามเซ็นยินยอมบนรถพยาบาลอย่างเป็นระเบียบ ถือว่าสถานะ DNR สมบูรณ์ <span class="font-bold text-indigo-700">→ ให้ประสานส่งเทียบเท่าผู้ป่วยสีเหลือง</span></li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-100 p-2.5 rounded border border-slate-200 text-xs leading-normal">
+                                <p class="font-bold text-slate-800">7.3 เกณฑ์ยกเว้นพิเศษกรณี Shock ร่วม:</p>
+                                <p class="text-slate-600">
+                                    กรณีผู้ป่วยแสดงเจตนางด CPR / งดใส่ ETT แต่หน้างานตรวจพบสัญญาณชีพความดันต่ำผิดปกติ <span class="font-bold text-slate-800">BP &lt; 90/60 mmHg</span> ร่วมกับมีอาการแสดงภาวะช็อกทางคลินิก (Sign of Shock) หากญาติยังยืนยันเจตจำนงในการรักษาแบบพยุงยาประคับประคองเต็มสูตร (<span class="font-bold text-indigo-700">Full medication</span>) <b>ให้ประสานนำส่งเทียบเท่าผู้ป่วยสีแดงวิกฤต</b>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: ADMIN & DIRECTIVES -->
+                <div id="man-admin" class="manual-tab-content space-y-4 hidden">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-slate-600"></span>
+                            <h3 class="text-base font-bold text-slate-800">📋 8. ข้อควรรู้เพิ่มเติมและเกณฑ์ปฏิบัติหน้างาน</h3>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+                            <div>
+                                <p class="font-bold text-slate-900">8.1 เกณฑ์อนุโลมทีม BLS นำส่งเคส Advanced แทน ALS:</p>
+                                <p class="text-xs text-slate-500 mb-1">ทีมระดับพื้นฐานนำส่งเคสวิกฤตแทน ALS ได้ภายใต้เกณฑ์ใดเกณฑ์หนึ่งดังต่อไปนี้:</p>
+                                <ol class="list-decimal pl-4 text-xs space-y-0.5">
+                                    <li>ไม่มีทีมระดับ ALS พร้อมปฏิบัติการตอบรับออกเหตุในขณะนั้น ภายในรัศมี 10 กิโลเมตร</li>
+                                    <li>ทีม BLS ประเมินแล้วสามารถนำส่งถึง ER โรงพยาบาลได้เร็วกว่าเวลาที่ต้องรอทีม ALS เดินทางมาถึงจุดเกิดเหตุ <span class="font-bold text-rose-700">ต่างกันมากกว่า 10 นาทีขึ้นไป</span> โดยประมาณ</li>
+                                    <li>ผู้ป่วยฉุกเฉินกลุ่มประคับประคอง (Palliative Care) ที่แสดงเจตจำนงชัดเจน</li>
+                                    <li>ดุลยพินิจของแพทย์เวรอำนวยการศูนย์สั่งการเห็นสมควรเป็นกรณีพิเศษ (เช่น ออกนัดพบครึ่งทาง Meet Halfway)</li>
+                                </ol>
+                            </div>
+
+                            <div>
+                                <p class="font-bold text-slate-900">8.2 การสับเปลี่ยนและรักษาอุปกรณ์ Spinal Board:</p>
+                                <ol class="list-decimal pl-4 text-xs space-y-0.5">
+                                    <li>ให้สับเปลี่ยน Spinal Board ทันทีเมื่อนำส่งเคสฉุกเฉินเสร็จสิ้นที่ รพ. ยกเว้นเคสวิกฤตที่แพทย์สงวนไว้ชั่วคราว</li>
+                                    <li><b>กรณี Cardiac Arrest:</b> ให้ทำ CPR & Resuscitation ต่อเนื่องไปก่อน และเปลี่ยนบอร์ดเมื่อแพทย์ ER ประเมินจังหวะเหมาะสมเพื่อลดการขัดจังหวะการทำ CPR (Minimize CPR interruption)</li>
+                                    <li>หากเปลี่ยนเตียงทันทีไม่ได้ ให้บันทึกเช็กอุปกรณที่ติดไปกับคนไข้พร้อมลงเบอร์ติดต่อ เพื่อให้ รพ. ติดต่อส่งคืนภายหลัง</li>
+                                </ol>
+                            </div>
+
+                            <div>
+                                <p class="font-bold text-slate-900">8.3 ข้อตกลงการใส่ท่อช่วยหายใจ (ETT) ในรถพยาบาล:</p>
+                                <ol class="list-decimal pl-4 text-xs space-y-0.5">
+                                    <li>การพิจารณาใส่ท่อช่วยหายใจบนรถพยาบาล อยู่ภายใต้การพิจารณาของผู้ปฏิบัติหน้าที่เคียงข้างผู้ป่วยตามโปรโตคอล</li>
+                                    <li>หากหน้างานประคองเปิดทางเดินหายใจด้วยวิธีอื่นได้สำเร็จ (OPA / Head-tilt, Chin-lift / Jaw thrust) <b>ควรพิจารณานำส่งไปใส่ท่อช่วยหายใจ ณ ห้องฉุกเฉิน (ER) ปลายทาง</b> จะปลอดภัยและเกิดผลข้างเคียงน้อยกว่าการพยายามใส่บนรถที่เคลื่อนตัว</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 text-slate-100 rounded-xl border border-slate-950 shadow-sm p-4 space-y-3">
+                        <div class="border-b border-slate-800 pb-2">
+                            <h3 class="text-base font-bold text-white">⚖️ 9. ขอบเขตอำนาจตัดสินใจเด็ดขาดของแพทย์อำนวยการ</h3>
+                        </div>
+                        <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                            <ol class="list-decimal pl-4 space-y-1.5">
+                                <li><span class="font-bold text-white">กรณีมีข้อขัดแย้งเชิงนโยบาย:</span> ปัญหาขัดแย้งใดๆ นอกเหนือแนวทางที่ระบุไว้ในคู่มือฉบับนี้ <b>ให้คำตัดสินของแพทย์เวรอำนวยการสั่งการศูนย์เอราวัณถือเป็นที่สิ้นสุดเด็ดขาด</b></li>
+                                <li><span class="font-bold text-white">การสั่ง "ดันเข้า" (Bypass Confirmation):</span> หากโรงพยาบาลใดปฏิเสธการประสานงาน "ยืนยันนำส่ง" ของผู้ป่วยสีแดงวิกฤต ให้รถพยาบาลนำส่งในรูปแบบ <b>"ดันเข้า" (นำส่งคนไข้ไปยังแผนกฉุกเฉิน รพ. ปลายทางทันทีโดยไม่ประวิงเวลารอการประสานงานตอบรับ)</b> ตามคำสั่งโดยตรงของแพทย์อำนวยการศูนย์สั่งการ</li>
+                                <li><span class="font-bold text-white">กรณีรถกู้ชีพไม่มีแพทย์ร่วมทีม:</span> การดูแลรักษาทางคลินิกและการประสานปลายทางทั้งหมด อยู่ภายใต้คำสั่งของแพทย์เวรอำนวยการศูนย์เอราวัณ</li>
+                                <li><span class="font-bold text-white">กรณีรถกู้ชีพมีแพทย์ประจำทีม:</span> ระบบการประสานส่งปลายทางเป็นอำนาจร่วมของแพทย์สั่งการศูนย์สั่งการ ส่วนแผนการรักษาหน้างานบนรถพยาบาลเป็นสิทธิ์วิชาชีพของแพทย์หัวหน้าชุดปฏิบัติการประจำรถคันดังกล่าว</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM TAB NAVIGATION (MOBILE EXCLUSIVE TABS) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg flex justify-around items-center py-2 px-1 z-40">
+        <button onclick="switchView('home')" id="nav-btn-home" class="flex flex-col items-center justify-center flex-1 text-bma-dark">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            <span class="text-[10px] font-bold mt-0.5">ระบบนำทาง Guide</span>
+        </button>
+        <button onclick="switchView('hub')" id="nav-btn-hub" class="flex flex-col items-center justify-center flex-1 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="text-[10px] font-bold mt-0.5">เปิดดูคู่มือ</span>
+        </button>
+    </nav>
+
+    <!-- JAVASCRIPT: DECISION TREE ENGINE AND VIEW ROUTING -->
+    <script>
+        // Active Navigation and Views
+        function switchView(viewId) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-wizard').classList.add('hidden');
+            document.getElementById('view-hub').classList.add('hidden');
+
+            document.getElementById('nav-btn-home').className = "flex flex-col items-center justify-center flex-1 text-slate-400";
+            document.getElementById('nav-btn-hub').className = "flex flex-col items-center justify-center flex-1 text-slate-400";
+
+            if (viewId === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+                document.getElementById('nav-btn-home').className = "flex flex-col items-center justify-center flex-1 text-bma-dark";
+            } else if (viewId === 'hub') {
+                document.getElementById('view-hub').classList.remove('hidden');
+                document.getElementById('nav-btn-hub').className = "flex flex-col items-center justify-center flex-1 text-bma-dark";
+            } else if (viewId === 'wizard') {
+                document.getElementById('view-wizard').classList.remove('hidden');
+                document.getElementById('nav-btn-home').className = "flex flex-col items-center justify-center flex-1 text-bma-dark";
+            }
+        }
+
+        function goToHome() {
+            switchView('home');
+        }
+
+        function switchTab(viewId) {
+            switchView(viewId);
+        }
+
+        // Triage Wizard Core Logic State
+        let currentTriage = '';
+        let currentSubState = {};
+
+        function selectTriage(type) {
+            currentTriage = type;
+            currentSubState = {};
+            switchView('wizard');
+
+            const badge = document.getElementById('wizard-badge');
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            
+            rCard.classList.add('hidden');
+
+            // Set styling based on chosen triage
+            if (type === 'red') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-rose-600";
+                badge.innerText = "🔴 RED - CRITICAL";
+                buildRedWizardStep1();
+            } else if (type === 'yellow') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-amber-500";
+                badge.innerText = "🟡 YELLOW - URGENT";
+                buildYellowWizardStep1();
+            } else if (type === 'green') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-emerald-600";
+                badge.innerText = "🟢 GREEN - NON-URGENT";
+                buildGreenWizard();
+            } else if (type === 'stroke') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-blue-600";
+                badge.innerText = "🧠 STROKE FAST TRACK";
+                buildStrokeWizard();
+            } else if (type === 'stemi') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-rose-600";
+                badge.innerText = "❤️ STEMI FAST TRACK";
+                buildStemiWizard();
+            } else if (type === 'trauma') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-indigo-600";
+                badge.innerText = "🩹 TRAUMA FAST TRACKS";
+                buildTraumaWizard();
+            } else if (type === 'maternal') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-pink-500";
+                badge.innerText = "🤰 OB/GYN FIRST PATHWAY";
+                buildMaternalWizard();
+            } else if (type === 'dnr') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold text-white bg-slate-800";
+                badge.innerText = "🎗️ DNR / PALLIATIVE";
+                buildDnrWizard();
+            }
+        }
+
+        // RED TRIAGE WIZARD STAGE
+        function buildRedWizardStep1() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-lg font-bold text-rose-950">ประเมินสถานะทางคลินิกเบื้องต้น</h3>
+                <p class="text-sm text-slate-600">โปรดเลือกสภาวะวิกฤตความปลอดภัยของผู้ป่วยขณะนี้:</p>
+                <div class="space-y-2.5 pt-1">
+                    <button onclick="processRedFlow('arrest')" class="w-full text-left p-3.5 border border-rose-200 hover:border-rose-400 bg-rose-50 rounded-xl text-sm font-bold text-rose-900 active:scale-[0.99] transition-all">
+                        🔴 ผู้ป่วยหยุดหายใจ / หัวใจหยุดเต้น (Cardiac Arrest)
+                    </button>
+                    <button onclick="processRedFlow('severe')" class="w-full text-left p-3.5 border border-rose-200 hover:border-rose-400 bg-rose-50 rounded-xl text-sm font-bold text-rose-900 active:scale-[0.99] transition-all">
+                        🔴 แพทย์เวรอำนวยการประเมินว่ามีอันตรายถึงชีวิตสาหัสยิ่งยวด
+                    </button>
+                    <button onclick="processRedFlow('stable-treated')" class="w-full text-left p-3.5 border border-indigo-200 hover:border-indigo-400 bg-indigo-50 rounded-xl text-sm font-bold text-indigo-900 active:scale-[0.99] transition-all">
+                        ➡️ ผู้ป่วยได้รับกู้ชีพเบื้องต้นพ้นขีดวิกฤตแล้ว (พ้นสภาวะสีแดงแล้ว)
+                    </button>
+                    <button onclick="processRedFlow('general')" class="w-full text-left p-3.5 border border-slate-200 hover:border-slate-300 bg-white rounded-xl text-sm font-bold text-slate-800 active:scale-[0.99] transition-all">
+                        🔴 สีแดงวิกฤตทั่วไปอื่นๆ (ESI 1 / ESI 2)
+                    </button>
+                </div>
+            `;
+        }
+
+        function processRedFlow(subType) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+
+            if (subType === 'arrest' || subType === 'severe') {
+                qCard.innerHTML = '';
+                rCard.classList.remove('hidden');
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3 shadow-sm">
+                        <div class="flex items-center gap-2 text-rose-800 font-bold text-base border-b border-rose-200 pb-2">
+                            <span class="w-2.5 h-2.5 bg-rose-600 rounded-full animate-ping"></span>
+                            🚨 สั่งการนำส่ง รพ. ใกล้เคียงที่สุดทันที!
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-rose-950">คำสั่งอำนวยการประสานส่ง:</p>
+                            <p>ประสานนำส่งโรงพยาบาลที่ใกล้ที่สุดทันที <span class="font-bold underline text-rose-700">โดยไม่มีข้อยกเว้นเกณฑ์ระยะห่างใดๆ และไม่อิงพื้นที่โซน</span></p>
+                            <div class="bg-white p-3 rounded-lg border border-rose-100 text-xs text-rose-900 font-semibold">
+                                *กรณีนี้เป็นอันตรายแก่ชีวิตสาหัสยิ่งยวด ห้ามประวิงเวลานำส่งไปยัง รพ. สิทธิ์/ประวัติเดิมหากอยู่ไกลกว่า
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (subType === 'stable-treated') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-indigo-950">ประเมินศักยภาพทีมปฏิบัติการบนรถ</h3>
+                    <p class="text-xs text-slate-500">เพื่อวางเกณฑ์ความปลอดภัยและระยะทางในการส่งต่อผู้ป่วยพ้นวิกฤต:</p>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="processRedTreatedFlow('special')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50">
+                            🩺 ชุดระดับเฉพาะทาง (มีแพทย์เวชศาสตร์ฉุกเฉิน EP ร่วมทีม)
+                        </button>
+                        <button onclick="processRedTreatedFlow('als')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50">
+                            🚑 ชุดปฏิบัติการระดับสูง (ALS / EMT)
+                        </button>
+                    </div>
+                `;
+            } else if (subType === 'general') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-rose-950">ตรวจสอบเกณฑ์อนุโลมระยะทาง 5 กิโลเมตร</h3>
+                    <p class="text-xs text-slate-500">กรุณาคำนวณและประเมินระยะทาง:</p>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="processRedGeneralFlow('within-5')" class="w-full text-left p-3 border border-indigo-200 bg-indigo-50/50 rounded-xl text-sm font-bold text-indigo-900 hover:bg-indigo-50">
+                            🗺️ ทราบสิทธิ์ / มีประวัติรักษาเดิม ในระยะเดินทางต่างจาก รพ.ใกล้สุดไม่เกิน 5 กม.
+                        </button>
+                        <button onclick="processRedGeneralFlow('over-5')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50">
+                            🗺️ สิทธิ์/ประวัติเดิม ห่างไกลเกิน 5 กม. หรือไม่ทราบสิทธิ์พยาบาลหลัก
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function processRedGeneralFlow(distanceType) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            if (distanceType === 'within-5') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2 flex items-center gap-2">
+                            <span>🗺️</span> เกณฑ์อนุโลมสิทธิ์ 5 กิโลเมตร (สีแดงทั่วไป)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">คำสั่งประสานนำส่ง:</p>
+                            <ol class="list-decimal pl-4 space-y-1 text-xs">
+                                <li><b>ให้ประสานส่งโรงพยาบาลตามสิทธิ์การรักษาพยาบาลหลัก</b> ของคนไข้เป็นลำดับแรก</li>
+                                <li>หากไม่ตอบรับ ให้ประสานนำส่งไปยังโรงพยาบาลที่มีประวัติรักษาเดิม</li>
+                            </ol>
+                            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded text-xs text-amber-900 font-semibold">
+                                *กรณีนี้ต้องผ่านการประเมินจากชุดปฏิบัติงานแล้วว่ามีความปลอดภัยระหว่างขนส่งอย่างยิ่ง
+                            </div>
+                            <!-- TRIGGER TRANSITION ON STABILIZED -->
+                            <div class="pt-2 border-t border-indigo-100 flex flex-col gap-2">
+                                <p class="text-xs font-semibold text-slate-500">หากหน้างานคนไข้ได้รับการกู้ชีพเบื้องต้นจนอาการคงที่ พ้นสภาวะวิกฤตแล้ว?</p>
+                                <button onclick="processRedFlow('stable-treated')" class="w-full bg-bma-dark hover:bg-bma-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                                    ➡️ ประเมินเพื่อลดระดับการดูแลแบบสีเหลือง
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                            🔴 เกณฑ์นำส่งกรณีทั่วไป (สีแดงวิกฤต)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">คำสั่งประสานนำส่ง:</p>
+                            <ol class="list-decimal pl-4 space-y-1 text-xs">
+                                <li><b>ประสานโรงพยาบาลที่ใกล้เคียงที่สุดทันที</b> (รัฐบาลหรือเอกชนที่ใช้ UCEP ได้) โดย <span class="font-bold underline text-rose-700">ไม่อิงพื้นที่โซน</span></li>
+                                <li>หากปฏิเสธ: ประสานโรงพยาบาลรัฐบาลที่ใกล้เคียงรองลงมาตามลำดับ <span class="font-bold">2 - 3 ลำดับ</span> เพื่อนำส่ง</li>
+                                <li>หากไม่มี รพ. ใดรับเคส: แพทย์สั่งการ <b>"ยืนยันนำส่ง" (ดันเข้าทันที)</b> รพ. ใกล้เคียงที่สุด</li>
+                            </ol>
+                            <!-- TRIGGER TRANSITION ON STABILIZED -->
+                            <div class="pt-2 border-t border-rose-200 flex flex-col gap-2">
+                                <p class="text-xs font-semibold text-slate-500">หากหน้างานคนไข้ได้รับการกู้ชีพเบื้องต้นจนอาการคงที่ พ้นสภาวะวิกฤตแล้ว?</p>
+                                <button onclick="processRedFlow('stable-treated')" class="w-full bg-bma-dark hover:bg-bma-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                                    ➡️ ประเมินเพื่อลดระดับการดูแลแบบสีเหลือง
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function processRedTreatedFlow(unitLevel) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            if (unitLevel === 'special') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2">
+                            🩺 ทีมเฉพาะทาง (EP) - ประเมินส่งสีเหลือง
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">ข้อบังคับโปรโตคอล:</p>
+                            <p class="text-xs text-slate-600">
+                                หากโรงพยาบาลใกล้ที่สุดประเมินการตรวจเบื้องต้นแล้วปฏิเสธรับเคส เนื่องจากคนไข้พ้นขีดวิกฤตแล้ว <span class="font-bold text-indigo-700">แพทย์อำนวยการสามารถใช้ดุลยพินิจตัดสินใจสั่งการประสานนำส่งตามแนวทางของผู้ป่วยสีเหลือง</span>
+                            </p>
+                            <div class="pt-2 border-t border-indigo-150 flex flex-col gap-2">
+                                <button onclick="selectTriage('yellow')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                                    🟡 ไปต่อที่ แนวทางปฏิบัติผู้ป่วยสีเหลือง (Yellow Protocol)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                            🚑 ทีมระดับสูง (ALS) - ข้อจำกัดการขนส่งพ้นวิกฤต
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">เกณฑ์ความปลอดภัย:</p>
+                            <ul class="list-disc pl-4 text-xs space-y-1 text-slate-600">
+                                <li>หากพ้นสภาวะสีแดงวิกฤตแล้ว ให้ดำเนินประสานนำส่งเช่นเดียวกับผู้ป่วยสีเหลือง</li>
+                                <li><span class="text-rose-700 font-bold">🚨 ข้อจำกัดความปลอดภัยสูงสุด:</span> ระยะทางขนส่งนำส่งไปยัง รพ. ปลายทางเป้าหมาย <span class="font-bold text-rose-700 underline">ต้องไม่เกินระยะ 20 กิโลเมตรโดยประมาณ</span> เนื่องจากยังถือว่าผู้ป่วยมีความเสี่ยงกลับไปเกิดภาวะวิกฤตทางกล้ามเนื้อหัวใจหรือระบบทางเดินหายใจซ้ำ (ยกเว้นเคส Hypoglycemia ที่ไม่มีปัญหาอื่นร่วม)</li>
+                            </ul>
+                            <div class="pt-2 border-t border-rose-200 flex flex-col gap-2">
+                                <button onclick="selectTriage('yellow')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                                    🟡 ไปต่อที่ แนวทางปฏิบัติผู้ป่วยสีเหลือง (Yellow Protocol)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // YELLOW TRIAGE WIZARD STAGE
+        function buildYellowWizardStep1() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-base font-bold text-amber-950">ประเมินสิทธิ์รักษาพยาบาล</h3>
+                <p class="text-xs text-slate-500">กรุณาเลือกรูปแบบสิทธิ์พยาบาลหลักของคนไข้สีเหลือง:</p>
+                <div class="space-y-2 pt-1">
+                    <button onclick="processYellowFlow('bma')" class="w-full text-left p-3 border border-amber-200 bg-amber-50/50 hover:bg-amber-50 rounded-xl text-sm font-semibold text-amber-900 active:scale-[0.99] transition-all">
+                        🟡 มีสิทธิ์รักษาพยาบาลหลัก ณ โรงพยาบาลใน กทม.
+                    </button>
+                    <button onclick="processYellowFlow('non-bma')" class="w-full text-left p-3 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-semibold text-slate-800 bg-white active:scale-[0.99] transition-all">
+                        🟡 สิทธิ์ว่าง / ข้าราชการ / สิทธิ์พยาบาลต่างจังหวัด
+                    </button>
+                </div>
+            `;
+        }
+
+        function processYellowFlow(type) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            if (type === 'bma') {
+                rCard.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-amber-900 border-b border-amber-200 pb-2">
+                            🟡 โปรโตคอลสีเหลือง (มีสิทธิ์ กทม.)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-slate-900">ลำดับการส่งตัวตามกฎหมาย:</p>
+                            <ol class="list-decimal pl-4 text-xs space-y-1">
+                                <li><b>ประสานส่ง รพ. ตามสิทธิ์การรักษาหลัก:</b> โดยระยะทางขนส่ง <span class="font-bold text-indigo-700">ไม่เกินประมาณ 40 กิโลเมตร</span></li>
+                                <li>หาก รพ. ตามสิทธิ์ปฏิเสธ หรือระยะเดินทางเกิน 40 กิโลเมตร: ประสานส่ง รพ. ที่มีประวัติรับการตรวจรักษาประจำโรคร่วมของคนไข้ (ที่ยังต่อเนื่องในระยะ 1 ปี) ภายในระยะไม่เกิน 40 กิโลเมตร</li>
+                                <li>กรณีไม่มี รพ. ตอบรับเคส: แพทย์สั่ง <b>"ยืนยันนำส่ง"</b> ตามโรคประจำตัวประวัติเดิม</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rCard.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-amber-950 border-b border-amber-200 pb-2">
+                            🟡 สิทธิ์ว่าง / ข้าราชการ / สิทธิ์ต่างจังหวัด (สีเหลือง)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-900">โปรดสืบประสานส่งตามบันได 4 ขั้นตอน:</p>
+                            <div class="space-y-1.5 text-xs">
+                                <p><b>ขั้น 1:</b> รพ. ประวัติรักษาเดิมใน กทม. (ใน 1 ปีที่ผ่านมา ไม่รวมโรคทั่วไป ไอ เจ็บคอ) ภายในระยะเดินทาง 40 กม.</p>
+                                <p><b>ขั้น 2:</b> โรงพยาบาลใกล้ที่สุดจุดเกิดเหตุ ภายในรัศมีไม่เกิน 40 กม. โดยประมาณ</p>
+                                <p><b>ขั้น 3:</b> โรงพยาบาลแม่ข่ายรายโซน (รพ. แม่โซน) ประจำโซนฉุกเฉิน</p>
+                                <p><b>ขั้น 4:</b> โรงพยาบาลสังกัดสำนักการแพทย์ ในเขตพื้นที่โซนนั้นๆ (ถ้ามี)</p>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-200 p-2.5 rounded text-xs text-rose-950 font-bold">
+                                *กรณีไม่มี รพ. ตอบรับเคส: ให้ยืนยันนำส่ง รพ. ประวัติเดิม หากไม่มีประวัติรักษาเดิม ให้ "ยืนยันนำส่ง" โรงพยาบาลรัฐบาลใกล้ที่สุดทันที (ไม่อิงพื้นที่โซน)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // GREEN TRIAGE WIZARD
+        function buildGreenWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+            rCard.innerHTML = `
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-3">
+                    <h4 class="text-base font-bold text-emerald-900 border-b border-emerald-200 pb-2">
+                        🟢 แนวปฏิบัติผู้ป่วยสีเขียว (ไม่ฉุกเฉิน)
+                    </h4>
+                    <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                        <p class="font-bold text-slate-900">โปรโตคอลหลัก:</p>
+                        <ul class="list-disc pl-4 text-xs space-y-1.5">
+                            <li>ให้ส่งเรื่องประสานงานผ่านหน่วยงาน <b>UMSC (หน่วยแพทย์เครือข่ายส่วนกลาง)</b> เป็นหลัก</li>
+                            <li>หากมีความจำเป็น อาจประสานรถระดับพื้นฐาน (BLS) เพื่อนำส่งแผนกผู้ป่วยนอก (OPD) ของโรงพยาบาลตามสิทธิ์หลักตามเวลาและวันทำการปกติ</li>
+                            <li>หากเป็นกรณีทีม ALS ประเมินคัดกรองหน้างานแล้วพบเป็นสีเขียว ให้ทีมกู้ชีพ ALS ช่วยดำเนินการนำส่งตามสิทธิ์ของผู้ป่วย หรือนำส่งตามเจตจำนงได้</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // STROKE WIZARD
+        function buildStrokeWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-base font-bold text-slate-900">ประเมินระยะเวลาการเกิดอาการ Onset</h3>
+                <p class="text-xs text-slate-500">เพื่อคัดแยกศักยภาพโรงพยาบาลปลายทางรับยา rTPA:</p>
+                <div class="space-y-2 pt-1">
+                    <button onclick="processStrokeFlow('under')" class="w-full text-left p-3 border border-blue-200 bg-blue-50/50 rounded-xl text-sm font-bold text-blue-900 hover:bg-blue-50">
+                        🧠 Onset &lt; 4.5 ชั่วโมง (นับแต่เริ่มแสดงอาการถึงคาดว่าจะได้รับยา)
+                    </button>
+                    <button onclick="processStrokeFlow('over')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50">
+                        🧠 Onset เกิน 4.5 ชั่วโมง หรือตรวจสอบประวัติไม่ได้แน่ชัด
+                    </button>
+                </div>
+            `;
+        }
+
+        function processStrokeFlow(onsetTime) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            rCard.innerHTML = `
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+                    <h4 class="text-base font-bold text-blue-900 border-b border-blue-200 pb-2">
+                        🧠 คำแนะนำรักษาและประสานนำส่ง (Stroke Fast Track)
+                    </h4>
+                    <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                        ${onsetTime === 'under' ? `
+                            <p class="font-bold text-blue-950">โปรโตคอล Onset &lt; 4.5 ชม.:</p>
+                            <p class="text-xs">
+                                ประสานนำส่งโรงพยาบาลที่มีศักยภาพเฉพาะทางในการตรวจวินิจฉัยและทำการให้ยาละลายลิ่มเลือด <span class="font-bold text-blue-700">rTPA / FTPA</span> ทันที โดยมีเกณฑ์การประเมินสภาพการจราจรร่วมด้วย
+                            </p>
+                            <p class="text-xs text-slate-600">
+                                *หากสงสัยการอุดตันขนาดใหญ่ (LVO) ให้ประสานนำส่งตรวจ CT Brain ยืนยันพยาธิสภาพก่อน แล้วจึงส่งทำการขจัดลิ่มเลือดผ่านสายสวน (Thrombectomy) ภายหลัง
+                            </p>
+                        ` : `
+                            <p class="font-bold text-blue-950">โปรโตคอล Onset เกิน 4.5 ชม.:</p>
+                            <p class="text-xs">
+                                การรักษาพ้นขีดจำกัด rTPA ให้ทำการประสานส่งต่อไปยังโรงพยาบาลที่มีขีดความสามารถการทำเครื่องตรวจ <b>CT Brain</b> เพื่อวินิจฉัยและระบุประเภทโรคโรคหลอดเลือดสมองเฉียบพลัน
+                            </p>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // STEMI WIZARD
+        function buildStemiWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+            rCard.innerHTML = `
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                    <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                        ❤️ แนวปฏิบัติ STEMI Fast Track (กล้ามเนื้อหัวใจขาดเลือด)
+                    </h4>
+                    <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                        <p class="font-bold text-rose-950">ข้อกำหนดการประสานนำส่ง:</p>
+                        <p class="text-xs">
+                            ปฏิบัติการรักษาและประสานส่งเสมือนผู้ป่วยสีแดงปกติ แต่ปลายทางต้องเป็น <b>โรงพยาบาลที่มีศักยภาพเฉพาะโรคในการสวนหัวใจ (PCI Center) ได้ตลอด 24 ชั่วโมง</b>
+                        </p>
+                        <div class="bg-rose-100/50 p-2.5 rounded border border-rose-200 text-xs font-bold text-rose-900">
+                            📢 บังคับ: หากรถพยาบาลทำ EKG 12 Lead สำเร็จ ให้รีบถ่ายภาพและส่งช่องทาง Line ศูนย์สั่งการเอราวัณ ID: 1646erawan (Erawan Official) ทันที เพื่อส่งเครือข่ายขยายหลอดเลือดประสานรอรับคนไข้
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // TRAUMA WIZARD
+        function buildTraumaWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-base font-bold text-slate-900">กรุณาเลือกประเภทการบาดเจ็บรุนแรง (Trauma)</h3>
+                <div class="space-y-2 pt-1">
+                    <button onclick="processTraumaFlow('head')" class="w-full text-left p-3 border border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 rounded-xl text-sm font-bold text-indigo-900 transition-all">
+                        🩹 บาดเจ็บที่ศีรษะ (Head Injury)
+                    </button>
+                    <button onclick="processTraumaFlow('amp')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 transition-all">
+                        🩹 บาดเจ็บอวัยวะขาด / ใกล้ขาด (Amputation)
+                    </button>
+                    <button onclick="processTraumaFlow('burn')" class="w-full text-left p-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 transition-all">
+                        🔥 แผลไหม้ / ไฟไหม้น้ำร้อนลวก (Severe Burn)
+                    </button>
+                </div>
+            `;
+        }
+
+        function processTraumaFlow(injuryType) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+
+            if (injuryType === 'head') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ประเมินระดับการรับรู้กลาสโกว์ (GCS Score)</h3>
+                    <p class="text-xs text-slate-500">เช็กเสถียรภาพผู้ป่วยบาดเจ็บศีรษะ:</p>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="showTraumaResult('head-gcs-3-8')" class="w-full text-left p-3 border border-rose-200 bg-rose-50 text-rose-900 rounded-xl text-sm font-bold">
+                            ⚠️ GCS 3 - 8 (หมดสติวิกฤต หรือไม่รู้สึกตัวเลย)
+                        </button>
+                        <button onclick="showTraumaResult('head-gcs-9-12')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             GCS 9 - 12 (รับรู้ปานกลาง สับสน ซึมลง)
+                        </button>
+                        <button onclick="showTraumaResult('head-gcs-13-15')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             GCS 13 - 15 (ระดับการรับรู้คงที่ ตอบคำถามปกติ)
+                        </button>
+                    </div>
+                `;
+            } else if (injuryType === 'amp') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ตรวจสอบตำแหน่งและ Vital Signs</h3>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="showTraumaResult('amp-proximal')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             ระดับเหนือต่อข้อเท้า หรือเหนือข้อมือขึ้นไป + Vital Signs คงที่
+                        </button>
+                        <button onclick="showTraumaResult('amp-distal')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             แผลขาดส่วนปลายสุด (เช่น นิ้วมือนิ้วเท้า) หรือ Vital Signs ไม่คงที่ (unstable)
+                        </button>
+                    </div>
+                `;
+            } else if (injuryType === 'burn') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ประเมินแผลไหม้และ Vital Signs</h3>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="showTraumaResult('burn-stable')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             Vital Signs คงที่ และบาดเจ็บร่วมส่วนอื่นไม่สาหัส
+                        </button>
+                        <button onclick="showTraumaResult('burn-unstable')" class="w-full text-left p-3 border border-rose-200 bg-rose-50 text-rose-900 rounded-xl text-sm font-bold">
+                            ⚠️ Vital Signs ไม่คงที่ หรือมีประเด็นโดนทำลายระบบหายใจ
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function showTraumaResult(resultKey) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            rCard.className = "space-y-4";
+
+            if (resultKey === 'head-gcs-3-8') {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2 flex items-center gap-2">
+                            <span>🚨</span> ด่วนที่สุด: ทางเดินหายใจวิกฤต (Airway First)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                            <p class="font-bold text-rose-950">โปรโตคอลบังคับเด็ดขาด:</p>
+                            <ol class="list-decimal pl-4 text-xs font-bold text-rose-900 space-y-1">
+                                <li>ต้องทำการจัดประคองจัดตั้งทางเดินหายใจ (Airway) ให้มั่นคงก่อนการเคลื่อนย้ายระยะไกล โดยทำหัตถการเบื้องต้น (เช่น OPA / Head-tilt, Chin-lift / Jaw thrust) หรือใส่ท่อช่วยหายใจ (ETT) บนรถ หรือแวะใส่ ETT ณ แผนกฉุกเฉิน (ER) ใกล้ที่สุด</li>
+                                <li>เมื่อรักษาทางเดินหายใจปลอดภัยแล้ว แพทย์อำนวยการประเมินเพื่อสั่งประสานส่งต่อ รพ. สิทธิ์หรือประวัติเดิมที่มีขีดความสามารถวินิจฉัย <b>CT Brain</b></li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+            } else if (resultKey === 'head-gcs-9-12') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2">
+                            🩹 เกณฑ์ประสานส่ง รพ. มี CT Brain
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            ให้ประสานนำส่งไปยังโรงพยาบาลใกล้ที่สุดที่มีขีดความสามารถการตรวจวิเคราะห์ด้วยเครื่อง <b>CT Brain</b> ทันที เพื่อป้องกันพยาธิสภาพสมองบวมและตกเลือดเฉียบพลัน
+                        </p>
+                    </div>
+                `;
+            } else if (resultKey === 'head-gcs-13-15') {
+                rCard.innerHTML = `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-amber-900 border-b border-amber-200 pb-2">
+                            🩹 เกณฑ์นำส่งรูปแบบสีเหลือง
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            ประสานนำส่งเช่นเดียวกับแนวทางปฏิบัติ <span class="font-bold text-amber-800">ผู้ป่วยสีเหลืองปกติ</span> (สิทธิ์พยาบาลหลัก กทม. ใน 40 กม. หรือ รพ. ประวัติเดิมเป็นหลัก)
+                        </p>
+                    </div>
+                `;
+            } else if (resultKey === 'amp-proximal') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2">
+                            🩹 เกณฑ์ต่ออวัยวะ (Vascular Surgeon)
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            ให้นำส่งโรงพยาบาลที่มี <b>ศัลยแพทย์หลอดเลือด (Vascular Surgeon)</b> ที่ใกล้และสามารถต่ออวัยวะได้โดยด่วนที่สุด (หากไม่มี รพ. ตอบรับ ให้แพทย์เวรอำนวยการเป็นผู้ระบุเลือก)
+                        </p>
+                    </div>
+                `;
+            } else if (resultKey === 'amp-distal') {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                            🔴 เกณฑ์นำส่งวิกฤตทั่วไป / สีแดง
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            กรณีแผลส่วนปลายและสัญญาณชีพผิดปกติ ให้ประสานส่งเป็นผู้ป่วยสีแดง นำส่งโรงพยาบาลรัฐใกล้เคียงสุดทันทีเพื่อกู้ชีพพยุงสัญญาณชีพเบื้องต้นก่อน
+                        </p>
+                    </div>
+                `;
+            } else if (resultKey === 'burn-stable') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2">
+                            🔥 เกณฑ์แผลไหม้รุนแรง (Burn Unit)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="text-xs">
+                                ให้นำส่งโรงพยาบาลเป้าหมายที่มี <b>หออภิบาลแผลไหม้เฉพาะทาง (Burn Unit)</b>
+                            </p>
+                            <p class="text-xs text-amber-900 font-semibold">
+                                *หากไม่มี รพ. ใดตอบรับการประสานนำส่ง แพทย์อำนวยการสั่ง <b>"ยืนยันนำส่ง" (ดันเข้า)</b> ไปยังโรงพยาบาลรัฐใกล้ที่สุดที่มี <b>แพทย์ศัลยกรรมทั่วไป (General Surgeon)</b>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (resultKey === 'burn-unstable') {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                            🔴 แผลไหม้วิกฤตฉุกเฉิน (สีแดง)
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            มีสัญญาณชีพไม่เสถียรและระบบทางเดินหายใจถูกรบกวน ให้ประสานนำส่งโรงพยาบาลใกล้ที่สุดทันทีตามเกณฑ์ <span class="font-bold text-rose-700">ผู้ป่วยสีแดงวิกฤต</span>
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // MATERNAL & CHILD WIZARD
+        function buildMaternalWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-base font-bold text-slate-900">ประเมินสถานะการทำคลอดฉุกเฉิน</h3>
+                <div class="space-y-2 pt-1">
+                    <button onclick="processMaternalFlow('bba')" class="w-full text-left p-3 border border-pink-200 bg-pink-50/50 text-pink-950 rounded-xl text-sm font-bold">
+                        🤰 ทารกคลอดเรียบร้อยแล้วนอกสถานพยาบาล (BBA)
+                    </button>
+                    <button onclick="processMaternalFlow('labor')" class="w-full text-left p-3 border border-slate-200 bg-white text-slate-800 rounded-xl text-sm font-semibold hover:bg-slate-50">
+                        🤰 มารดามีอาการเจ็บครรภ์คลอด (In Labor)
+                    </button>
+                </div>
+            `;
+        }
+
+        function processMaternalFlow(subType) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+
+            if (subType === 'bba') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ประเมินข้อจำกัดเด็กคลอดเฉียบพลัน (BBA)</h3>
+                    <div class="space-y-2.5 pt-1">
+                        <button onclick="showMaternalResult('bba-nicu')" class="w-full text-left p-3 border border-rose-200 bg-rose-50 text-rose-900 rounded-xl text-xs font-bold leading-relaxed">
+                            ⚠️ คลอดก่อนกำหนด (GA &le; 32 wk / นน. &le; 1,500g) หรือ ต้องการช่วยหายใจ CPAP/PPV/ETT หรือ แพทย์พิจารณาต้องการ Intensive monitoring
+                        </button>
+                        <button onclick="showMaternalResult('bba-sick-newborn')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-xs font-semibold text-slate-800 leading-normal">
+                            ทารกส้มเช้ง ซึม น้ำตาลส้นเท้า hypoglycemia &le; 50 mg/dl หรือ Apgar &le; 8 ร่วมกับ GA &gt; 32 wk และ นน. &gt; 1,500g
+                        </button>
+                        <button onclick="showMaternalResult('bba-normal')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-xs font-semibold text-slate-800 leading-normal">
+                            สัญญาณชีพและระดับออกซิเจนทารกดีปกติ ไม่เข้าเกณฑ์ข้างต้น
+                        </button>
+                    </div>
+                `;
+            } else if (subType === 'labor') {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ประเมินอายุครรภ์ทารกในครรภ์ (In Labor)</h3>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="showMaternalResult('labor-nicu')" class="w-full text-left p-3 border border-rose-200 bg-rose-50 text-rose-900 rounded-xl text-sm font-bold">
+                            ⚠️ อายุครรภ์ GA &le; 32 สัปดาห์ หรือคาดการณ์ นน. &le; 1,500 กรัม
+                        </button>
+                        <button onclick="showMaternalResult('labor-normal')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             อายุครรภ์ GA &gt; 32 สัปดาห์ หรือคาดการณ์ นน. &gt; 1,500 กรัม
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function showMaternalResult(key) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            rCard.className = "space-y-4";
+
+            if (key === 'bba-nicu') {
+                rCard.innerHTML = `
+                    <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-pink-900 border-b border-pink-200 pb-2">
+                            🤰 เกณฑ์ทารกวิกฤตความปลอดภัยแรกคลอด (NICU)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-900">คำสั่งอำนวยการส่งต่อ:</p>
+                            <p class="text-xs">
+                                ให้นำส่งโรงพยาบาลที่มีขีดความสามารถสูงในการจัดตั้งห้องอภิบาลวิกฤตทารกแรกเกิด <span class="bg-pink-100 text-pink-800 font-bold px-1 rounded">หออภิบาลวิกฤตเด็กแรกเกิด (NICU)</span> ทันที
+                            </p>
+                            <div class="bg-white p-2.5 rounded border border-pink-100 text-xs text-slate-500">
+                                *กรณีผู้ป่วยแม่และเด็กที่เป็น<b>สีแดงวิกฤต</b> ระยะเดินทางขนส่งสูงสุดต้องไม่เกินประมาณ <b>20 กิโลเมตร</b>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (key === 'bba-sick-newborn') {
+                rCard.innerHTML = `
+                    <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-pink-900 border-b border-pink-200 pb-2">
+                            🤰 ทารกป่วยแรกเกิด (Sick Newborn)
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            ให้ประสานนำส่งโรงพยาบาลปลายทางที่มี <b>ห้องดูแลทารกป่วย (Sick Newborn Unit)</b> ที่ใกล้ที่สุด
+                        </p>
+                    </div>
+                `;
+            } else if (key === 'bba-normal') {
+                rCard.innerHTML = `
+                    <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 space-y-2">
+                        <h4 class="text-base font-bold text-pink-900 border-b border-pink-200 pb-2">
+                            🤰 ทารกแรกเกิดทั่วไป (กุมารแพทย์ทั่วไป)
+                        </h4>
+                        <p class="text-xs text-slate-700 leading-normal">
+                            ให้ประสานนำส่งโรงพยาบาลที่มี <b>กุมารแพทย์ทั่วไป (General Pediatrician)</b> ปฏิบัติงาน
+                        </p>
+                    </div>
+                `;
+            } else if (key === 'labor-nicu') {
+                rCard.innerHTML = `
+                    <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-pink-900 border-b border-pink-200 pb-2">
+                            🤰 ครรภ์เสี่ยงสูงวิกฤต (NICU Goal)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-900">ลำดับประสานส่ง:</p>
+                            <ol class="list-decimal pl-4 text-xs space-y-1">
+                                <li>ประสานส่ง รพ. ที่ฝากครรภ์เป็นอันดับแรก หรือส่งตามสิทธิ์หลัก</li>
+                                <li>หากถูกปฏิเสธ: ประสานนำส่งโรงพยาบาลที่มี <b>NICU</b> ทดแทนทันที</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+            } else if (key === 'labor-normal') {
+                rCard.innerHTML = `
+                    <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-pink-900 border-b border-pink-200 pb-2">
+                            🤰 ครรภ์เจ็บท้องคลอดปกติ
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-900">ลำดับประสานส่ง:</p>
+                            <ol class="list-decimal pl-4 text-xs space-y-1">
+                                <li>ประสานส่ง รพ. ที่ฝากครรภ์เป็นอันดับแรก หรือส่งตามสิทธิ์หลัก</li>
+                                <li>หากถูกปฏิเสธ: ประสานนำส่ง รพ. ที่มีห้องดูแลทารกป่วย (Sick Newborn) หรือกุมารแพทย์ทั่วไปทดแทน</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // DNR WIZARD
+        function buildDnrWizard() {
+            const qCard = document.getElementById('wizard-question-card');
+            qCard.innerHTML = `
+                <h3 class="text-base font-bold text-slate-900">ประเมินเสถียรภาพและภาวะ Shock ร่วม</h3>
+                <div class="space-y-2 pt-1">
+                    <button onclick="processDnrFlow('shock')" class="w-full text-left p-3 border border-rose-200 bg-rose-50 text-rose-900 rounded-xl text-sm font-bold">
+                        ⚠️ ตรวจพบ BP &lt; 90/60 mmHg ร่วมกับอาการแสดงภาวะช็อกทางคลินิก (Sign of Shock)
+                    </button>
+                    <button onclick="processDnrFlow('no-shock')" class="w-full text-left p-3 border border-slate-200 bg-white text-slate-800 rounded-xl text-sm font-semibold">
+                         สัญญาณชีพ Vital Signs คงที่ ไม่มีภาวะช็อกทางคลินิก
+                    </button>
+                </div>
+            `;
+        }
+
+        function processDnrFlow(vitalsState) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+
+            if (vitalsState === 'shock') {
+                qCard.innerHTML = '';
+                rCard.classList.remove('hidden');
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-rose-900 border-b border-rose-200 pb-2">
+                            🚨 กรณีพิเศษ: ผู้ป่วยมีภาวะช็อกร่วมประสงค์ประคองยา
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-rose-950">คำสั่งอำนวยการ:</p>
+                            <p class="text-xs">
+                                แม้จะมีเจตจำนงงด CPR / งดใส่ท่อ ETT แต่หากตรวจพบภาวะความดันต่ำและช็อก และญาติยังคงต้องการรักษายาเพื่อประคองอาการแบบจัดเต็มสูตร (<span class="font-bold text-indigo-700">Full medication</span>) <b>ให้ประสานนำส่งเช่นเดียวกับผู้ป่วยสีแดงปกติ</b>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                qCard.innerHTML = `
+                    <h3 class="text-base font-bold text-slate-900">ตรวจสอบประวัติ DNR และสายรัด wrist band</h3>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="showDnrResult('existing')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             มีประวัติเซ็น DNR เดิม หรือสวมสาย wrist band Palliative เจตจำนงชัดเจน
+                        </button>
+                        <button onclick="showDnrResult('new-als')" class="w-full text-left p-3 border border-slate-200 bg-white rounded-xl text-sm font-semibold text-slate-800">
+                             แจ้งความประสงค์ DNR ใหม่บนรถพยาบาล (ทีมระดับ ALS / BLS ปฏิบัติงาน)
+                        </button>
+                        <button onclick="showDnrResult('new-ep')" class="w-full text-left p-3 border border-indigo-200 bg-indigo-50/50 text-indigo-900 rounded-xl text-sm font-bold">
+                             แจ้งความประสงค์ DNR ใหม่บนรถพยาบาล (ทีมเฉพาะทางมีแพทย์ EP ปฏิบัติงาน)
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function showDnrResult(key) {
+            const qCard = document.getElementById('wizard-question-card');
+            const rCard = document.getElementById('wizard-result-card');
+            qCard.innerHTML = '';
+            rCard.classList.remove('hidden');
+
+            rCard.className = "space-y-4";
+
+            if (key === 'existing') {
+                rCard.innerHTML = `
+                    <div class="bg-slate-100 border border-slate-300 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-slate-900 border-b border-slate-200 pb-2">
+                            🎗️ DNR เดิม / มี Wrist Band Palliative
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-slate-800">คำสั่งอำนวยการประสาน:</p>
+                            <p class="text-xs">
+                                ญาติมีสิทธิ์แจ้งข้อมูลประวัติเดิม ไม่จำเป็นต้องใช้เอกสารฉบับจริงหน้างาน <span class="font-bold text-indigo-700 underline">ให้ดำเนินการประสานนำส่งเช่นเดียวกับผู้ป่วยสีเหลืองปกติ</span> เพื่อป้องกันหัตถการแทรกแซงกู้ชีพที่ไม่เหมาะสม
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (key === 'new-als') {
+                rCard.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-rose-950 border-b border-rose-200 pb-2">
+                            🎗️ DNR แจ้งประสงค์ใหม่ (ทีม ALS / BLS)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-rose-950">คำเตือนกฎหมาย:</p>
+                            <p class="text-xs text-rose-900 font-bold">
+                                สถานะ DNR ถือว่า "ยังไม่สมบูรณ์ถูกต้อง" บนรถกู้ชีพ
+                            </p>
+                            <ul class="list-disc pl-4 text-xs space-y-1 text-slate-600">
+                                <li>ต้องทำการประสานและนำส่งเช่นเดียวกับ <b>ผู้ป่วยสีแดงวิกฤตปกติ</b></li>
+                                <li>ข้อแนะนำ: แนะนำให้หลีกเลี่ยงนำส่ง รพ. เอกชนเพื่อป้องกันข้อพิพาทสิทธิ์เบิกจ่าย UCEP ภายหลัง</li>
+                                <li>เมื่อถึงห้องฉุกเฉิน รพ. และแพทย์กู้ชีพ EP พูดคุยลงบันทึกเซ็นยินยอมเป็นเอกสารเรียบร้อยแล้ว ถือว่าเสร็จสมบูรณ์จึงประสานนำส่งต่อตามสิทธิ์ได้</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (key === 'new-ep') {
+                rCard.innerHTML = `
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+                        <h4 class="text-base font-bold text-indigo-900 border-b border-indigo-200 pb-2">
+                            🎗️ DNR แจ้งประสงค์ใหม่ (ทีมเฉพาะทางมีแพทย์ EP)
+                        </h4>
+                        <div class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                            <p class="font-bold text-indigo-950">สถานะ DNR มีผลตามระเบียบสมบูรณ์:</p>
+                            <p class="text-xs">
+                                เนื่องจากมีแพทย์ EP ร่วมปฏิบัติการกำกับควบคุมดูแล และทำการลงบันทึกการรักษาเจตจำนงเซ็นยินยอมบนรถเรียบร้อยแล้ว <span class="font-bold text-indigo-700">→ ให้ศูนย์ประสานและนำส่งตามเกณฑ์ของผู้ป่วยสีเหลือง</span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // TAB SWITCHER IN REFERENCE HUB
+        function switchManualTab(tabId) {
+            // Hide all manual tabs contents
+            const contents = document.getElementsByClassName('manual-tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.add('hidden');
+            }
+
+            // Show active contents
+            if (tabId === 'tab-triage') {
+                document.getElementById('man-triage').classList.remove('hidden');
+            } else if (tabId === 'tab-yellow-green') {
+                document.getElementById('man-yellow-green').classList.remove('hidden');
+            } else if (tabId === 'tab-fasttrack') {
+                document.getElementById('man-fasttrack').classList.remove('hidden');
+            } else if (tabId === 'tab-maternal-dnr') {
+                document.getElementById('man-maternal-dnr').classList.remove('hidden');
+            } else if (tabId === 'tab-admin') {
+                document.getElementById('man-admin').classList.remove('hidden');
+            }
+
+            // Toggle active styles on buttons
+            const buttons = document.getElementsByClassName('manual-tab-btn');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].className = 'manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-600 border border-slate-200';
+            }
+
+            const activeBtnMap = {
+                'tab-triage': 'btn-tab-triage',
+                'tab-yellow-green': 'btn-tab-yellow-green',
+                'tab-fasttrack': 'btn-tab-fasttrack',
+                'tab-maternal-dnr': 'btn-tab-maternal-dnr',
+                'tab-admin': 'btn-tab-admin'
+            };
+
+            document.getElementById(activeBtnMap[tabId]).className = 'manual-tab-btn flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-bma-dark text-white';
+        }
+
+        // FULLTEXT PROTOCOLS SEARCHHUB ENGINE
+        function searchProtocols() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const container = document.getElementById('manual-contents-container');
+            const items = container.querySelectorAll('.border.border-slate-200');
+
+            if (!query) {
+                items.forEach(item => {
+                    item.style.display = 'block';
+                    item.classList.remove('ring-2', 'ring-amber-500');
+                });
+                return;
+            }
+
+            // Temporarily open all tabs to look across manual
+            const contents = document.getElementsByClassName('manual-tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('hidden');
+            }
+
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                    item.classList.add('ring-2', 'ring-amber-500');
+                } else {
+                    item.style.display = 'none';
+                    item.classList.remove('ring-2', 'ring-amber-500');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
